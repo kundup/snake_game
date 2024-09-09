@@ -13,6 +13,7 @@ FPS = 60
 game_over = False
 score = 0
 black = (0, 0, 0)
+accelaration_speed = 2
 
 
 def all_text(text, color, x, y, size):
@@ -21,6 +22,11 @@ def all_text(text, color, x, y, size):
     font_rect = font_render.get_rect(midbottom=(x, y))
     screen.blit(font_render, font_rect)
 
+def accelaration(score, accelaration_speed):
+    if score > accelaration_speed * 2:
+        player.direction += 0.5
+        accelaration_speed = score
+    return accelaration_speed
 
 # Bait class
 class Bait(pg.sprite.Sprite):
@@ -43,14 +49,14 @@ class Bait(pg.sprite.Sprite):
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, vel):
         super().__init__()
         img = pg.image.load("block.jpg").convert_alpha()
         self.image = pg.transform.smoothscale(img, (15, 15))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.direction = 1
+        self.direction = vel
         self.dx = self.direction
         self.dy = 0
 
@@ -86,7 +92,7 @@ class Player(pg.sprite.Sprite):
 
 
 bait = Bait()
-player = Player(50, 50)
+player = Player(50, 50, 1)
 
 run = True
 while run:
@@ -97,6 +103,10 @@ while run:
 
     game_over = player.update(game_over)
     score = bait.update()
+    accelaration_speed = accelaration(score, accelaration_speed)
+
+    if game_over:
+        all_text("Game Over", black, 250, 250, 50)
 
     all_text(f"Points:{score}", black, 40, 20, 25)
     pg.display.update()
