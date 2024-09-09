@@ -11,6 +11,15 @@ pg.display.set_caption("snake_game")
 clock = pg.time.Clock()
 FPS = 60
 game_over = False
+score = 0
+black = (0,0,0)
+
+
+def all_text(text, color, x, y, size):
+    font_surf = pg.font.Font("Pixeltype.ttf", size)
+    font_render = font_surf.render(text, False, color)
+    font_rect = font_render.get_rect(midbottom=(x, y))
+    screen.blit(font_render, font_rect)
 
 
 # Bait class
@@ -30,7 +39,7 @@ class Bait(pg.sprite.Sprite):
             self.rect.y = random.randint(10, 480)
 
         screen.blit(self.image, self.rect)
-
+        return self.score
 
 class Player(pg.sprite.Sprite):
     def __init__(self, x, y):
@@ -87,9 +96,10 @@ while run:
 
     game_over = player.update(game_over)
 
-    if not game_over:
-        bait.update()
 
+    score = bait.update()
+
+    all_text(f"Points:{score}", black, 40, 20, 25)
     pg.display.update()
     clock.tick(FPS)
 
@@ -97,7 +107,7 @@ pg.quit()
 
 # collision (done)
 # boundary (done)
-# score addition
+# score addition (done)
 # opening and game_over screen
 # acceleration
 # enlarging size
