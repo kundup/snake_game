@@ -12,7 +12,7 @@ clock = pg.time.Clock()
 FPS = 60
 game_over = False
 score = 0
-black = (0,0,0)
+black = (0, 0, 0)
 
 
 def all_text(text, color, x, y, size):
@@ -40,6 +40,7 @@ class Bait(pg.sprite.Sprite):
 
         screen.blit(self.image, self.rect)
         return self.score
+
 
 class Player(pg.sprite.Sprite):
     def __init__(self, x, y):
@@ -95,8 +96,6 @@ while run:
             run = False
 
     game_over = player.update(game_over)
-
-
     score = bait.update()
 
     all_text(f"Points:{score}", black, 40, 20, 25)
