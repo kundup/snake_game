@@ -1,6 +1,6 @@
 import pygame as pg
 import random
-import time
+
 
 # pygame initializing
 pg.init()
@@ -70,6 +70,8 @@ class Player:
     def __init__(self):
         self.reset(50 ,50, 2)
         self.ghost_rect = None
+        self.ghost_image = pg.image.load("ghost.png").convert_alpha()
+
 
     def grow(self):
         # new block place the last position of block
@@ -115,19 +117,20 @@ class Player:
 
             if self.list[0][0] <= 0 or self.list[0][0] >= width - SIZE or self.list[0][1] <= 0 or self.list[0][1] >= height - SIZE:
                 game_over = 1
-                time.sleep(.3)
+
 
         else:
             if not self.ghost_rect:
                 self.list = []
-                img = pg.image.load("ghost.png")
-                self.image = pg.transform.smoothscale(img, (SIZE * 1.5, SIZE * 1.5))
+                self.image = pg.transform.smoothscale(self.ghost_image, (SIZE * 1.5, SIZE * 1.5))
                 self.ghost_rect = self.image.get_rect()
                 self.ghost_rect.x = 200
                 self.ghost_rect.y = 180
                 self.list.append(self.ghost_rect)
 
             self.ghost_rect.y -= 1
+            if self.ghost_rect.y < 0:
+                self.ghost_rect = None
 
         for block in self.list:
             screen.blit(self.image, block)
@@ -135,8 +138,8 @@ class Player:
         return game_over
 
     def reset(self, x, y, vel):
-        img = pg.image.load("block.jpg").convert_alpha()
-        self.image = pg.transform.smoothscale(img, (SIZE, SIZE))
+        self.image = pg.image.load("block.jpg").convert_alpha()
+        self.image = pg.transform.smoothscale(self.image, (SIZE, SIZE))
         self.direction = vel
         self.dx = self.direction
         self.dy = 0
