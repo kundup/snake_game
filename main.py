@@ -1,6 +1,6 @@
 import pygame as pg
 import random
-
+from deneme import *
 
 # pygame initializing
 pg.init()
@@ -12,6 +12,8 @@ FPS = 60
 SIZE = 15
 color = (0, 0, 0)
 bg_color = (100,150,250)
+color_hurdle = (randint(0,255),randint(0,255),randint(0,255))
+hurdles = []
 
 # definitions
 screen = pg.display.set_mode((width, height))
@@ -22,7 +24,6 @@ clock = pg.time.Clock()
 game_over = False
 score = 0
 acceleration_speed = 2
-
 
 def all_text(text, color, x, y, size):
     font_surf = pg.font.Font("Pixeltype.ttf", size)
@@ -35,25 +36,42 @@ def acceleration(score, acceleration_speed):
     if score > acceleration_speed * 2:
         player.direction += 1
         acceleration_speed = score
+        new_hurdle = Hurdle()
+        hurdles.append(new_hurdle)
+
     return acceleration_speed
 
 class Restart:
     def __init__(self):
         img = pg.image.load("restart_btn.png")
-        self.image = pg.transform.smoothscale(img, (70,35))
+        self.image = pg.transform.smoothscale(img, (90,40))
         self.rect = self.image.get_rect()
         self.rect.x = 210
         self.rect.y = 270
 
     def update(self):
-        global game_over, score
+        global game_over, score, acceleration_speed
         pos = pg.mouse.get_pos()
         if self.rect.collidepoint(pos) and pg.mouse.get_pressed()[0]:
             player.reset(50, 50, 2)
             game_over = 0
             score = 0
+            acceleration_speed = 2
 
         screen.blit(self.image, self.rect)
+
+class Hurdle:
+    def __init__(self):
+        self.img = pg.Surface((SIZE, SIZE))
+        self.img.fill(color_hurdle)
+        self.rect = self.img.get_rect()
+        self.rect.x =randint(40, 480)
+        self.rect.y = randint(40, 480)
+
+    def update(self):
+        screen.blit(self.img, self.rect)
+
+
 
 class Bait:
     def __init__(self):
@@ -85,7 +103,15 @@ class Player:
         if head_rect.colliderect(bait.rect):
             bait.rect.x = random.randint(15, 485)
             bait.rect.y = random.randint(15, 485)
+
             return True
+        return False
+
+    def collision_over(self):
+        head_rect = pg.Rect(self.list[0][0], self.list[0][1], SIZE, SIZE)
+        for i in hurdles:
+            if head_rect.colliderect(i.rect):
+                return True
         return False
 
     def update(self, game_over):
@@ -119,6 +145,7 @@ class Player:
                 game_over = 1
 
 
+
         else:
             if not self.ghost_rect:
                 self.list = []
@@ -138,8 +165,7 @@ class Player:
         return game_over
 
     def reset(self, x, y, vel):
-        self.image = pg.image.load("block.jpg").convert_alpha()
-        self.image = pg.transform.smoothscale(self.image, (SIZE, SIZE))
+        self.image = blockland.block
         self.direction = vel
         self.dx = self.direction
         self.dy = 0
@@ -149,6 +175,7 @@ class Player:
 player = Player()
 bait = Bait()
 restart = Restart()
+
 
 run = True
 while run:
@@ -166,9 +193,17 @@ while run:
         score += 1
         player.grow()
 
+    for hurd in hurdles:
+        hurd.update()
+
+    if player.collision_over():
+        game_over = 1
+
     if game_over:
         all_text("Game Over", color, 250, 250, 50)
+        hurdles = []
         restart.update()
+
 
 
     all_text(f"Points:{score}", color, 40, 20, 25)
