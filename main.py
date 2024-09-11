@@ -1,5 +1,6 @@
 import pygame as pg
 import random
+import time
 
 # pygame initializing
 pg.init()
@@ -36,6 +37,23 @@ def acceleration(score, acceleration_speed):
         acceleration_speed = score
     return acceleration_speed
 
+class Restart:
+    def __init__(self):
+        img = pg.image.load("restart_btn.png")
+        self.image = pg.transform.smoothscale(img, (70,35))
+        self.rect = self.image.get_rect()
+        self.rect.x = 210
+        self.rect.y = 270
+
+    def update(self):
+        global game_over, score
+        pos = pg.mouse.get_pos()
+        if self.rect.collidepoint(pos) and pg.mouse.get_pressed()[0]:
+            player.reset(50, 50, 2)
+            game_over = 0
+            score = 0
+
+        screen.blit(self.image, self.rect)
 
 class Bait:
     def __init__(self):
@@ -49,13 +67,9 @@ class Bait:
 
 
 class Player:
-    def __init__(self, x, y, vel):
-        img = pg.image.load("block.jpg").convert_alpha()
-        self.image = pg.transform.smoothscale(img, (SIZE, SIZE))
-        self.direction = vel
-        self.dx = self.direction
-        self.dy = 0
-        self.list = [(x, y)]  # at first only one block
+    def __init__(self):
+        self.reset(50 ,50, 2)
+        self.ghost_rect = None
 
     def grow(self):
         # new block place the last position of block
@@ -101,17 +115,37 @@ class Player:
 
             if self.list[0][0] <= 0 or self.list[0][0] >= width - SIZE or self.list[0][1] <= 0 or self.list[0][1] >= height - SIZE:
                 game_over = 1
+                time.sleep(.3)
 
+        else:
+            if not self.ghost_rect:
+                self.list = []
+                img = pg.image.load("ghost.png")
+                self.image = pg.transform.smoothscale(img, (SIZE * 1.5, SIZE * 1.5))
+                self.ghost_rect = self.image.get_rect()
+                self.ghost_rect.x = 200
+                self.ghost_rect.y = 180
+                self.list.append(self.ghost_rect)
 
-            for block in self.list:
-                screen.blit(self.image, block)
+            self.ghost_rect.y -= 1
 
+        for block in self.list:
+            screen.blit(self.image, block)
 
         return game_over
 
+    def reset(self, x, y, vel):
+        img = pg.image.load("block.jpg").convert_alpha()
+        self.image = pg.transform.smoothscale(img, (SIZE, SIZE))
+        self.direction = vel
+        self.dx = self.direction
+        self.dy = 0
+        self.list = [(x, y)]  # at first only one block
+        self.ghost_rect = None
 
-player = Player(50, 50, 2)
+player = Player()
 bait = Bait()
+restart = Restart()
 
 run = True
 while run:
@@ -131,6 +165,8 @@ while run:
 
     if game_over:
         all_text("Game Over", color, 250, 250, 50)
+        restart.update()
+
 
     all_text(f"Points:{score}", color, 40, 20, 25)
 
