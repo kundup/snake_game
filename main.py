@@ -55,16 +55,16 @@ class Player:
         self.direction = vel
         self.dx = self.direction
         self.dy = 0
-        self.list = [(x, y)]  # Yılanın başı başlangıçta tek bir blok
+        self.list = [(x, y)]  # at first only one block
 
     def grow(self):
-        # Yılanın son bloğunun pozisyonunu alarak yeni blok ekle
+        # new block place the last position of block
         last_x, last_y = self.list[-1]
-        new_block = (last_x, last_y)  # Yeni blok son bloğun pozisyonunda başlar
+        new_block = (last_x , last_y )  # new block starts the position
         self.list.append(new_block)
 
     def collision(self):
-        # Yılanın başı bait'e çarparsa
+        # eat the bait by mounth
         head_rect = pg.Rect(self.list[0][0], self.list[0][1], SIZE, SIZE)
         if head_rect.colliderect(bait.rect):
             bait.rect.x = random.randint(15, 485)
@@ -88,19 +88,20 @@ class Player:
                 self.dy = -self.direction
                 self.dx = 0
 
-            # Yılanın gövde parçalarını güncelle
+            # updating the body
             if len(self.list) > 1:
                 for i in range(len(self.list) - 1, 0, -1):
-                    self.list[i] = self.list[i - 1]  # Bir önceki bloğun pozisyonunu al
+                    self.list[i] = self.list[i - 1]  # former position
 
-            # Yılanın başını hareket ettir
+            # update head of snake
             head_x, head_y = self.list[0]
             new_head_x = head_x + self.dx
             new_head_y = head_y + self.dy
             self.list[0] = (new_head_x, new_head_y)
 
-            if self.list[0][0] <= 0 or self.list[0][0] >= width or self.list[0][1] <= 0 or self.list[0][1] >= height:
+            if self.list[0][0] <= 0 or self.list[0][0] >= width - SIZE or self.list[0][1] <= 0 or self.list[0][1] >= height - SIZE:
                 game_over = 1
+
 
             for block in self.list:
                 screen.blit(self.image, block)
@@ -123,7 +124,7 @@ while run:
     acceleration_speed = acceleration(score, acceleration_speed)
     bait.update()
 
-    # Eğer çarpışma olursa yılan büyüsün ve skor artsın
+    # snake grows and scores
     if player.collision():
         score += 1
         player.grow()
