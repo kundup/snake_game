@@ -1,6 +1,6 @@
 import pygame as pg
 import random
-from deneme import *
+from blocks import *
 
 # pygame initializing
 pg.init()
