@@ -1,3 +1,5 @@
+import sys
+
 import pygame as pg
 import random
 from blocks import *
@@ -14,7 +16,13 @@ color = (0, 0, 0)
 bg_color = (100,150,250)
 color_hurdle = (randint(0,255),randint(0,255),randint(0,255))
 hurdles = []
+is_paused = False
 
+#images
+res_img = pg.image.load("restart_btn.png").convert_alpha()
+rec_img = pg.Surface((SIZE, SIZE)).convert()
+bait_img = pg.image.load("coin.png").convert_alpha()
+ghost_img = pg.image.load("ghost.png").convert_alpha()
 # definitions
 screen = pg.display.set_mode((width, height))
 pg.display.set_caption("snake_game")
@@ -31,6 +39,19 @@ def all_text(text, color, x, y, size):
     font_rect = font_render.get_rect(midbottom=(x, y))
     screen.blit(font_render, font_rect)
 
+def pause_game():
+    global is_paused
+    is_paused = True
+    while is_paused:
+        for event in pg.event.get():
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    is_paused = False
+
+            if event.type == pg.QUIT:
+                sys.exit()
+                pg.quit()
+
 
 def acceleration(score, acceleration_speed):
     if score > acceleration_speed * 2:
@@ -43,8 +64,7 @@ def acceleration(score, acceleration_speed):
 
 class Restart:
     def __init__(self):
-        img = pg.image.load("restart_btn.png")
-        self.image = pg.transform.smoothscale(img, (90,40))
+        self.image = pg.transform.smoothscale(res_img, (90,40))
         self.rect = self.image.get_rect()
         self.rect.x = 210
         self.rect.y = 270
@@ -62,7 +82,7 @@ class Restart:
 
 class Hurdle:
     def __init__(self):
-        self.img = pg.Surface((SIZE, SIZE))
+        self.img = rec_img
         self.img.fill(color_hurdle)
         self.rect = self.img.get_rect()
         self.rect.x =randint(40, 480)
@@ -75,7 +95,7 @@ class Hurdle:
 
 class Bait:
     def __init__(self):
-        self.img = pg.image.load("coin.png")
+        self.img = bait_img
         self.rect = self.img.get_rect()
         self.rect.x = random.randint(15, 485)
         self.rect.y = random.randint(15, 485)
@@ -88,7 +108,7 @@ class Player:
     def __init__(self):
         self.reset(50 ,50, 2)
         self.ghost_rect = None
-        self.ghost_image = pg.image.load("ghost.png").convert_alpha()
+        self.ghost_image = ghost_img
 
 
     def grow(self):
@@ -183,6 +203,11 @@ while run:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run = False
+
+        if event.type == pg.KEYDOWN and not game_over:
+            if event.key == pg.K_SPACE:
+                pause_game()
+
 
     game_over = player.update(game_over)
     acceleration_speed = acceleration(score, acceleration_speed)
