@@ -23,6 +23,7 @@ res_img = pg.image.load("restart_btn.png").convert_alpha()
 rec_img = pg.Surface((SIZE, SIZE)).convert()
 bait_img = pg.image.load("coin.png").convert_alpha()
 ghost_img = pg.image.load("ghost.png").convert_alpha()
+
 # definitions
 screen = pg.display.set_mode((width, height))
 pg.display.set_caption("snake_game")
@@ -32,6 +33,7 @@ clock = pg.time.Clock()
 game_over = False
 score = 0
 acceleration_speed = 2
+high_score = 0
 
 def all_text(text, color, x, y, size):
     font_surf = pg.font.Font("Pixeltype.ttf", size)
@@ -40,17 +42,15 @@ def all_text(text, color, x, y, size):
     screen.blit(font_render, font_rect)
 
 def pause_game():
-    global is_paused
     is_paused = True
     while is_paused:
         for event in pg.event.get():
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_SPACE:
                     is_paused = False
 
             if event.type == pg.QUIT:
                 sys.exit()
-                pg.quit()
 
 
 def acceleration(score, acceleration_speed):
@@ -61,6 +61,13 @@ def acceleration(score, acceleration_speed):
         hurdles.append(new_hurdle)
 
     return acceleration_speed
+
+def point(score):
+    if player.collision():
+        score += 1
+        player.grow()
+    all_text(f"Points:{score}", color, 40, 20, 25)
+    return score
 
 class Restart:
     def __init__(self):
@@ -214,9 +221,10 @@ while run:
     bait.update()
 
     # snake grows and scores
-    if player.collision():
-        score += 1
-        player.grow()
+    score = point(score)
+    if score > high_score:
+        high_score = score
+
 
     for hurd in hurdles:
         hurd.update()
@@ -229,9 +237,7 @@ while run:
         hurdles = []
         restart.update()
 
-
-
-    all_text(f"Points:{score}", color, 40, 20, 25)
+    all_text(f"High_score: {high_score}", color, 420, 20, 25)
 
     pg.display.update()
     clock.tick(FPS)
