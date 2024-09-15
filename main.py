@@ -59,7 +59,6 @@ def pause_game():
             if event.type == pg.QUIT:
                 sys.exit()
 
-
 def acceleration(score, acceleration_speed):
     if score > acceleration_speed * 2:
         player.direction += 1
@@ -106,7 +105,6 @@ class Hurdle:
         screen.blit(self.img, self.rect)
 
 
-
 class Bait:
     def __init__(self):
         self.img = bait_img
@@ -124,7 +122,6 @@ class Player:
         self.ghost_rect = None
         self.ghost_image = ghost_img
 
-
     def grow(self):
         # new block place the last position of block
         last_x, last_y = self.list[-1]
@@ -137,7 +134,6 @@ class Player:
         if head_rect.colliderect(bait.rect):
             bait.rect.x = random.randint(15, 485)
             bait.rect.y = random.randint(15, 485)
-
             return True
         return False
 
@@ -179,7 +175,6 @@ class Player:
                 game_over = 1
 
 
-
         else:
             if not self.ghost_rect:
                 self.list = []
@@ -210,7 +205,6 @@ player = Player()
 bait = Bait()
 restart = Restart()
 
-
 run = True
 while run:
     screen.fill(bg_color)
@@ -229,8 +223,7 @@ while run:
     acceleration_speed = acceleration(score, acceleration_speed)
     bait.update()
 
-    # snake grows and scores
-
+    # snake scores
     score = point(score)
     if score > data["high_score"]:
         data["high_score"] = score
