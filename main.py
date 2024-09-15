@@ -23,6 +23,7 @@ res_img = pg.image.load("restart_btn.png").convert_alpha()
 rec_img = pg.Surface((SIZE, SIZE)).convert()
 bait_img = pg.image.load("coin.png").convert_alpha()
 ghost_img = pg.image.load("ghost.png").convert_alpha()
+hurdle_image = pg.image.load("wall.png")
 
 # definitions
 screen = pg.display.set_mode((width, height))
@@ -89,8 +90,8 @@ class Restart:
 
 class Hurdle:
     def __init__(self):
-        self.img = rec_img
-        self.img.fill(color_hurdle)
+        self.img = hurdle_image
+        #self.img.fill(color_hurdle)
         self.rect = self.img.get_rect()
         self.rect.x =randint(40, 480)
         self.rect.y = randint(40, 480)
